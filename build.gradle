@@ -1,0 +1,51 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath("log4j:log4j:1.2.17")
+        classpath("commons-io:commons-io:2.5")
+    }
+}
+
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'idea'
+apply plugin: 'application'
+
+jar {
+    baseName = 'nccm-patch-generator'
+    version =  '0.1.0'
+}
+
+repositories {
+    mavenCentral()
+}
+
+task finalDist(type: Copy, dependsOn: 'fatJar') {
+    from 'log4j.properties'
+    into 'build/libs'
+}
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+sourceSets.main.java.srcDirs = ['src']
+mainClassName = 'com.cisco.nccm.patch.generator.PatchGeneratorMain'
+
+dependencies {
+    compile("log4j:log4j:1.2.17")
+    compile("commons-io:commons-io:2.5")
+}
+
+task fatJar(type: Jar) {
+	manifest {
+        attributes 'Main-Class': 'com.cisco.nccm.patch.generator.PatchGeneratorMain'
+    }
+    baseName = 'nccm-patch-generator-0.1.0'
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    with jar
+}
+
+task wrapper(type : Wrapper){
+	gradleVersion = '3.5.1'
+}

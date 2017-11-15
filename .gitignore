@@ -1,0 +1,10 @@
+.classpath
+.project
+.gradle/
+.settings
+bin/
+build/
+catalogue.csv
+instructions.csv
+server_3.*.zip
+ServerPatch.zip
