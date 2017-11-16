@@ -147,12 +147,15 @@ public class PatchGeneratorMain {
             List<String> remainingFiles = lines.stream().filter((line) -> {
                 return !filesCopiedToZip.contains(line.substring(2)) && !line.startsWith("Status");
             }).collect(Collectors.toList());
-            Path finalCSV = Paths.get("instructions.csv");
-            if (!Files.exists(finalCSV)) {
-                Files.createFile(finalCSV);
+            Path instructions = Paths.get("instructions.txt");
+            if (!Files.exists(instructions)) {
+                Files.createFile(instructions);
             }
-            remainingFiles.add(0, "Commands,Arguments");
-            Files.write(finalCSV, remainingFiles, StandardOpenOption.TRUNCATE_EXISTING);
+            List<String> commands = new ArrayList<String>();
+            remainingFiles.forEach((fileToBeDeleted) -> {
+                commands.add("rm -f /var/pari/dash/" + fileToBeDeleted.substring(fileToBeDeleted.indexOf("/") + 1));
+            });
+            Files.write(instructions, commands, StandardOpenOption.TRUNCATE_EXISTING);
             FileUtils.deleteDirectory(Paths.get("ServerPatch").toFile());
         } catch (Exception e) {
             logger.error("Error while modifying catalogue file", e);
