@@ -136,13 +136,13 @@ public class PatchGeneratorMain {
             zipOutputStream.close();
             fileOutputStream.flush();
             fileOutputStream.close();
-            deleteAllEntriesExceptDeletedFilesFromCatalogueFile();
+            generateInstructions();
         } catch (Exception e) {
             logger.error("Error while zipping Patch folder", e);
         }
     }
 
-    private static void deleteAllEntriesExceptDeletedFilesFromCatalogueFile() {
+    private static void generateInstructions() {
         try {
             List<String> remainingFiles = lines.stream().filter((line) -> {
                 return !filesCopiedToZip.contains(line.substring(2)) && !line.startsWith("Status");
