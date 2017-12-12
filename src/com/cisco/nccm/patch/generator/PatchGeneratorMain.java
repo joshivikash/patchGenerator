@@ -26,10 +26,11 @@ import org.apache.log4j.PropertyConfigurator;
 
 public class PatchGeneratorMain {
 
-    private static Logger       logger  = Logger.getLogger(PatchGeneratorMain.class);
-    private static ZipFile      zipFile = null;
+    private static Logger       logger      = Logger.getLogger(PatchGeneratorMain.class);
+    private static ZipFile      zipFile     = null;
     private static List<String> lines;
     private static List<String> filesCopiedToZip;
+    private static boolean      isUpgradeDB = true;
     private static Path         catalogueFilePath;
 
     public static void main(String[] args) {
@@ -85,6 +86,9 @@ public class PatchGeneratorMain {
                     Files.copy(inputStream, Paths.get("ServerPatch/" + zipEntry.getName()),
                             StandardCopyOption.REPLACE_EXISTING);
                     inputStream.close();
+                    if (!isUpgradeDB && zipEntry.getName().endsWith("nccmupgradescript_postgres.sql")) {
+                        isUpgradeDB = true;
+                    }
                     filesCopiedToZip.add(zipEntry.getName());
                 }
             }
@@ -152,9 +156,18 @@ public class PatchGeneratorMain {
                 Files.createFile(instructions);
             }
             List<String> commands = new ArrayList<String>();
+            String dashHome = PatchGeneratorProperties.getInstance().getDashHome();
             remainingFiles.forEach((fileToBeDeleted) -> {
-                commands.add("rm -f /var/pari/dash/" + fileToBeDeleted.substring(fileToBeDeleted.indexOf("/") + 1));
+                commands.add("rm -f " + dashHome + "/" + fileToBeDeleted.substring(fileToBeDeleted.indexOf("/") + 1));
             });
+            if (isUpgradeDB) {
+                commands.add(dashHome + "/jre/bin/java -classpath " + "ScriptExecutor.jar:" + dashHome
+                        + "/lib/postgresql-9.3-1103.jdbc4.jar:" + dashHome + "/lib/jasypt-1.9.1.jar:" + dashHome
+                        + "/lib/bcprov-jdk15on-157.jar:" + dashHome + "/lib/log4j-api-2.5.jar:" + dashHome
+                        + "/lib/log4j-core-2.5.jar:" + dashHome
+                        + "/lib/log4j-1.2-api-2.5.jar com.pari.tools.db.ScriptExecutor -upgrade " + dashHome
+                        + "/bin/nccmupgradescript_postgres.sql");
+            }
             Files.write(instructions, commands, StandardOpenOption.TRUNCATE_EXISTING);
             FileUtils.deleteDirectory(Paths.get("ServerPatch").toFile());
         } catch (Exception e) {
