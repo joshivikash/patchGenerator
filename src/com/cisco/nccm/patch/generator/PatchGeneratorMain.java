@@ -161,7 +161,7 @@ public class PatchGeneratorMain {
                 commands.add("rm -f " + dashHome + "/" + fileToBeDeleted.substring(fileToBeDeleted.indexOf("/") + 1));
             });
             if (isUpgradeDB) {
-                commands.add(dashHome + "/jre/bin/java -classpath " + "ScriptExecutor.jar:" + dashHome
+                commands.add(dashHome + "/jre/bin/java -classpath " + dashHome + "/lib/ScriptExecutor.jar:" + dashHome
                         + "/lib/postgresql-9.3-1103.jdbc4.jar:" + dashHome + "/lib/jasypt-1.9.1.jar:" + dashHome
                         + "/lib/bcprov-jdk15on-157.jar:" + dashHome + "/lib/log4j-api-2.5.jar:" + dashHome
                         + "/lib/log4j-core-2.5.jar:" + dashHome
