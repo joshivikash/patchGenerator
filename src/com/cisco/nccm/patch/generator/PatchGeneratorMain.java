@@ -26,11 +26,11 @@ import org.apache.log4j.PropertyConfigurator;
 
 public class PatchGeneratorMain {
 
-    private static Logger       logger      = Logger.getLogger(PatchGeneratorMain.class);
-    private static ZipFile      zipFile     = null;
+    private static Logger       logger  = Logger.getLogger(PatchGeneratorMain.class);
+    private static ZipFile      zipFile = null;
     private static List<String> lines;
     private static List<String> filesCopiedToZip;
-    private static boolean      isUpgradeDB = true;
+    private static boolean      isUpgradeDB;
     private static Path         catalogueFilePath;
 
     public static void main(String[] args) {
