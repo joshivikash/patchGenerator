@@ -1,18 +1,8 @@
-
-<package>
- <name>Service Pack maintenance update</name>
- <description>Service Pack maintenance update</description>
- <requires-version></requires-version>
- <provides-version>sp-60.0.1-0-0-lnx64</provides-version>
- <reboot-needed>1</reboot-needed>
- <requires>
- </requires>
- <type>SP</type>
- <components>
-  <component>
-   <name>NCCM </name>
-   <description>CSPC Base version 2.7.3 component</description>
-   <dir>NCCM</dir>
-  </component>
- </components>
-</package>
+<?xml version='1.0' encoding='utf-8'?>
+<component>
+        <name>NCCM Base</name>
+        <description>NCCM Base component</description>
+        <provides-version>3.4.0</provides-version>
+        <requires>
+        </requires>
+</component>
