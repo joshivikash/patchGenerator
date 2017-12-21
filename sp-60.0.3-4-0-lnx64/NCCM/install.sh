@@ -19,16 +19,14 @@ for file in `unzip -Z -1 ServerPatch`; do
 				if [[ lastIndex -gt 1 ]]
 				   then
 						# If the file exists in both places
-						lsCommandResult=$( ls '/var/pari/dash/'$newFile)
+						lsCommandResult=$(ls /var/pari/dash/$newFile 2>&1 > /dev/null)
 						isFileAlreadyExist=""
-
-						if [[ $lsCommandResult == *'No such file or directory' ]]
+						if [[ $lsCommandResult == *"No such file or directory" ]]
 								then
 										isFileAlreadyExist='fileAbsent'
 								else
 										isFileAlreadyExist='filePresent'
 						fi
-
 						if [[ $isFileAlreadyExist == 'filePresent' ]]
 								then
 										# Take a back up of that file
@@ -55,46 +53,50 @@ for file in `unzip -Z -1 ServerPatch`; do
 													     chown $owner:$group $bk_dir/$newFile
 												fi
 
-                                                                                                # If the file is a "properties" or "xml" file, then merge them
+                                                # If the file is a "properties" or "xml" file, then merge them
 												if [[ $file == *".xml" || $file == *".properties" ]]
 													then
 														if [[ $file == *".xml" ]]
 							  						        	then
-													                     /var/pari/dash/jre/bin/java -cp nccmInstallUtil.jar com.pari.pwd.util.XMLMerger $file $newFile
-							elif [[ $newFile == "resources/server/global/nccmDatabase.properties" ]]
-								then
-									 awk -F= '!a[$1]++' /var/pari/dash/resources/server/global/nccmDatabase.properties $file > /var/pari/dash/resources/server/global/nccmDBPropMerge
+													                    /var/pari/dash/jre/bin/java -cp pari_audit_api.jar:nccmInstallUtil.jar com.pari.pwd.util.XMLMerger $file "var/pari/dash/"$newFile
+														elif [[ $newFile == "resources/server/global/nccmDatabase.properties" ]]
+															then
+																awk -F= '!a[$1]++' /var/pari/dash/resources/server/global/nccmDatabase.properties $file > /var/pari/dash/resources/server/global/nccmDBPropMerge
 									 
-									 mv /var/pari/dash/resources/server/global/nccmDBPropMerge /var/pari/dash/resources/server/global/nccmDatabase.properties
+																mv /var/pari/dash/resources/server/global/nccmDBPropMerge /var/pari/dash/resources/server/global/nccmDatabase.properties
 									 
-									 chmod 755 /var/pari/dash/resources/server/global/nccmDatabase.properties
+																chmod 755 /var/pari/dash/resources/server/global/nccmDatabase.properties
 									 
-							elif [[ $newFile == "resources/server/global/nccm.properties" ]]
-								then
-									 awk -F= '!a[$1]++' /var/pari/dash/resources/server/global/nccm.properties $file > /var/pari/dash/resources/server/global/nccmPropMerge
-									 
-									 mv /var/pari/dash/resources/server/global/nccmPropMerge /var/pari/dash/resources/server/global/nccm.properties
-									 
-									 chmod 755 /var/pari/dash/resources/server/global/nccm.properties
-									 
-							elif [[ $newFile == "resources/server/global/cma.properties" ]]
-								then
-									 awk -F= '!a[$1]++' /var/pari/dash/resources/server/global/cma.properties $file > /var/pari/dash/resources/server/global/cmaPropMerge
-									 
-									 mv /var/pari/dash/resources/server/global/cmaPropMerge /var/pari/dash/resources/server/global/cma.properties
-									 
-									 chmod 755 /var/pari/dash/resources/server/global/cma.properties
-									 
-							elif [[ $newFile == "resources/server/global/nccm-asd.properties" ]]
-								then
-									 awk -F= '!a[$1]++' /var/pari/dash/resources/server/global/nccm-asd.properties $file > /var/pari/dash/resources/server/global/asdPropMerge
-									 
-									 mv /var/pari/dash/resources/server/global/asdPropMerge /var/pari/dash/resources/server/global/nccm-asd.properties										
-							  							fi
-												fi	
-						fi
-					echo "Coping file.... "$file" to /var/pari/dash/"$newFile
-                    \cp -f $file '/var/pari/dash/'$newFile
+														elif [[ $newFile == "resources/server/global/nccm.properties" ]]
+															then
+																 awk -F= '!a[$1]++' /var/pari/dash/resources/server/global/nccm.properties $file > /var/pari/dash/resources/server/global/nccmPropMerge
+																 
+																 mv /var/pari/dash/resources/server/global/nccmPropMerge /var/pari/dash/resources/server/global/nccm.properties
+																 
+																 chmod 755 /var/pari/dash/resources/server/global/nccm.properties
+																 
+														elif [[ $newFile == "resources/server/global/cma.properties" ]]
+															then
+																 awk -F= '!a[$1]++' /var/pari/dash/resources/server/global/cma.properties $file > /var/pari/dash/resources/server/global/cmaPropMerge
+																 
+																 mv /var/pari/dash/resources/server/global/cmaPropMerge /var/pari/dash/resources/server/global/cma.properties
+																 
+																 chmod 755 /var/pari/dash/resources/server/global/cma.properties
+																 
+														elif [[ $newFile == "resources/server/global/nccm-asd.properties" ]]
+															then
+																 awk -F= '!a[$1]++' /var/pari/dash/resources/server/global/nccm-asd.properties $file > /var/pari/dash/resources/server/global/asdPropMerge
+																 
+																 mv /var/pari/dash/resources/server/global/asdPropMerge /var/pari/dash/resources/server/global/nccm-asd.properties										
+																					fi
+														else
+															 echo "Coping file.... "$file" to /var/pari/dash/"$newFile
+															 \cp -f $file '/var/pari/dash/'$newFile
+														fi	
+							else
+									echo "VIKASH Coping file.... "$file" to /var/pari/dash/"$newFile
+									\cp -f $file '/var/pari/dash/'$newFile
+							fi
 				fi
 		fi
 
