@@ -23,8 +23,9 @@ repositories {
 }
 
 task finalDist(type: Copy, dependsOn: 'fatJar') {
-    from 'log4j.properties'
+    from '.'
     into 'build/libs'
+	include('log4j.properties','nccmPatchGenerator.properties')
 }
 
 sourceCompatibility = 1.8
