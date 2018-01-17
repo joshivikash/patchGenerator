@@ -75,21 +75,24 @@ public class PatchGeneratorMain {
                 if (isModifiedOrAdded) {
                     inputStream = zipFile.getInputStream(zipEntry);
                     String[] folderStructure = zipEntry.getName().split("/");
-                    String previousFolder = "ServerPatch/";
-                    for (int i = 0; i < folderStructure.length - 1; i++) {
+                    String previousFolder = "ServerPatch";
+                    int length = (zipEntry.isDirectory()) ? folderStructure.length : folderStructure.length - 1;
+                    for (int i = 0; i < length; i++) {
                         Path folderPath = Paths.get(previousFolder + File.separator + folderStructure[i]);
                         if (!Files.exists(folderPath)) {
                             Files.createDirectories(folderPath);
                         }
                         previousFolder += File.separator + folderStructure[i];
                     }
-                    Files.copy(inputStream, Paths.get("ServerPatch/" + zipEntry.getName()),
-                            StandardCopyOption.REPLACE_EXISTING);
-                    inputStream.close();
-                    if (!isUpgradeDB && zipEntry.getName().endsWith("nccmupgradescript_postgres.sql")) {
-                        isUpgradeDB = true;
+                    if (!zipEntry.isDirectory()) {
+                        Files.copy(inputStream, Paths.get("ServerPatch" + File.separator + zipEntry.getName()),
+                                StandardCopyOption.REPLACE_EXISTING);
+                        if (!isUpgradeDB && zipEntry.getName().endsWith("nccmupgradescript_postgres.sql")) {
+                            isUpgradeDB = true;
+                        }
+                        filesCopiedToZip.add(zipEntry.getName());
                     }
-                    filesCopiedToZip.add(zipEntry.getName());
+                    inputStream.close();
                 }
             }
             zipPatchFolder();

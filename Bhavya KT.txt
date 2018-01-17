@@ -1,0 +1,47 @@
+Testing SP with LCM Manager
+-----------------------------
+Will create a new patch with all the required workarounds, and upload it to NCCM Features page
+
+Conf Server Enable
+-----------------------
+We need to rename the queue from "nccm.inbound.queue" to "collector.inbound.queue" in Preinstall step of SP installation.
+
+Handling Dev Entitlement in LCM
+----------------------------------
+cd /opt/cisco/ss/adminshell/derby/bin
+export DERBY_HOME=/opt/cisco/ss/adminshell/derby/bin
+export PATH=/opt/java/jre/bin:$PATH
+export CLASSPATH=/opt/cisco/ss/adminshell/derby/lib/derbytools.jar:/opt/cisco/ss/adminshell/derby/lib/derbynet.jar:/opt/cisco/ss/adminshell/derby/lib/derby.jar:/opt/cisco/ss/adminshell/derby/lib/derbyclient.jar:.
+. setNetworkClientCP
+
+java org.apache.derby.tools.ij
+connect 'jdbc:derby://localhost:1527/opt/LCM/info/status;create=true;user=app;password=password';
+update register_info set CONN_LB_URL='https://173.38.37.173/';
+exit;
+
+cd /opt/ConcsoTgw/tail-end-gateway-decoupled/conf/
+mv csof_config.xml csof_config.xml.old
+
+SP Nomenclature
+------------------
+To be checked with Jogendra (jokushwa) regarding SP Nomenclature and provisions of specifying NCCM Version Information in some meta file of SP like version.txt
+
+LCM APIs to get data from LCM Manager to NCCM.
+-------------------------------------------------
+1. Enabling conf server in NCCM Box through NCCM UI without using LCM Addon.
+2. APIs to get list of available SPs
+3. API to download a given SP and install it in NCCM Box.
+
+
+Using LCM Agent Jar
+-------------------------
+public List<ServicePackDTOV2> executeCheckUpdateCommand(String level, String packageType,boolean isScheduled, String requestId) throws LCMException, Exception{
+
+UpdateCommandImpl.java
+
+lcmAgent-1.6-SNAPSHOT
+
+LCM Manager : 64.100.244.8
+
+Maven Location :http://engci-maven-master.cisco.com/artifactory/cstg-smartservices-release/com/cisco/ca/ss/lcmAgent/1.6-RELEASE/
+http://engci-maven-master.cisco.com/artifactory/cstg-smartservices-release/com/cisco/ca/ss/lcm/lcmagentmgr-dto/1.6-RELEASE/
