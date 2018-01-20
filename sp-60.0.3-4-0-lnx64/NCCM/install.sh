@@ -1,106 +1,101 @@
-rm -fr linux_release
-# Creating backup folder
-timestamp=$( date +%s )
-bk_dir="/var/pari/dash_bk_"$timestamp
-mkdir $bk_dir
+#!/bin/bash
 
+# Init 
+USER_INSTALL_FOLDER_1=/var/pari
+USER_INSTALL_FOLDER_2=/var/pari/dash
+SP_APPLY_TIMESTAMP=$( date +%s )
+rm -rf $USER_INSTALL_FOLDER_1/dash_backup
+mkdir $USER_INSTALL_FOLDER_1/dash_backup
+cp -a $USER_INSTALL_FOLDER_2/. $USER_INSTALL_FOLDER_1/dash_backup
+rm -rf $USER_INSTALL_FOLDER_2/SP_TEMP*
+mkdir $USER_INSTALL_FOLDER_2/SP_TEMP_$SP_APPLY_TIMESTAMP
+USER_INSTALL_DIR=$USER_INSTALL_FOLDER_2/SP_TEMP_$SP_APPLY_TIMESTAMP
+chmod -R 777 $USER_INSTALL_FOLDER_2/
+service dash stop
+
+
+# Installing
+export NCCMHOME=$USER_INSTALL_FOLDER_2
+export JRE_HOME=$USER_INSTALL_FOLDER_2/jre
+export PATH=$PATH:$USER_INSTALL_FOLDER_2/jre/bin/
+cp ServerPatch.zip  $USER_INSTALL_DIR/ServerPatch.zip
+cd $USER_INSTALL_DIR
 unzip ServerPatch
-# Copying the files from ServerPatch.zip to /var/pari/dash
-for file in `unzip -Z -1 ServerPatch`; do
-        file="$(echo $file | sed 's#\\#\/#g#')"
-        newFile="$(echo $file | cut -c 15-)"
-		rev_bk_file=$( echo $newFile | rev ) # Reversing the name of the file
-		rev_bk_file_length=$( echo ${#rev_bk_file}  )
-		rev_bk_file_length=`expr $rev_bk_file_length + 0`
-		if [[ $rev_bk_file_length -gt 0  ]]
-		   then
-				lastIndex=`expr index $rev_bk_file /`
-				# Checking if it is a file or not
-				if [[ lastIndex -gt 1 ]]
-				   then
-						# If the file exists in both places
-						lsCommandResult=$(ls /var/pari/dash/$newFile 2>&1 > /dev/null)
-						isFileAlreadyExist=""
-						if [[ $lsCommandResult == *"No such file or directory" ]]
-								then
-										isFileAlreadyExist='fileAbsent'
-								else
-										isFileAlreadyExist='filePresent'
-						fi
-						if [[ $isFileAlreadyExist == 'filePresent' ]]
-								then
-										# Take a back up of that file
-												# Step:1) Create required parent folder under backup folder
-														# Step:1:i) Extract the directory structure of the file to be backed up
-																# Step:1:i:a) Calculating the last index of the "/" in the file name
-																indx=`expr index $rev_bk_file /`
-																dir=$( echo ${rev_bk_file:indx} | rev )
-												   mkdir -p $bk_dir/$dir
-												   
-												# Step:2) Take the backup
-												\cp -f '/var/pari/dash/'$newFile $bk_dir/$newFile
-												
-												# Step:3) Reset the owner and group of the backed up file
-												owner=$( ls -l /var/pari/dash/$newFile | awk '{print $3}' )
-												group=$( ls -l /var/pari/dash/$newFile | awk '{print $4}' )
-                                                                                                
-												if [[ $dir == "webui/"* ]]
-													then
-                                                                                                             cd $bk_dir
-													     chown -R $owner:$group webui
-													     cd - &> /dev/null
-													else
-													     chown $owner:$group $bk_dir/$newFile
-												fi
+rm -f ServerPatch.zip
+unzip PerlModules
+rm -f PerlModules.zip
+chmod +x *.sh
+chmod +x *.sql
+chmod +x dash
 
-                                                # If the file is a "properties" or "xml" file, then merge them
-												if [[ $file == *".xml" || $file == *".properties" ]]
-													then
-														if [[ $file == *".xml" ]]
-							  						        	then
-													                    /var/pari/dash/jre/bin/java -cp pari_audit_api.jar:nccmInstallUtil.jar com.pari.pwd.util.XMLMerger $file "var/pari/dash/"$newFile
-														elif [[ $newFile == "resources/server/global/nccmDatabase.properties" ]]
-															then
-																awk -F= '!a[$1]++' /var/pari/dash/resources/server/global/nccmDatabase.properties $file > /var/pari/dash/resources/server/global/nccmDBPropMerge
-									 
-																mv /var/pari/dash/resources/server/global/nccmDBPropMerge /var/pari/dash/resources/server/global/nccmDatabase.properties
-									 
-																chmod 755 /var/pari/dash/resources/server/global/nccmDatabase.properties
-									 
-														elif [[ $newFile == "resources/server/global/nccm.properties" ]]
-															then
-																 awk -F= '!a[$1]++' /var/pari/dash/resources/server/global/nccm.properties $file > /var/pari/dash/resources/server/global/nccmPropMerge
-																 
-																 mv /var/pari/dash/resources/server/global/nccmPropMerge /var/pari/dash/resources/server/global/nccm.properties
-																 
-																 chmod 755 /var/pari/dash/resources/server/global/nccm.properties
-																 
-														elif [[ $newFile == "resources/server/global/cma.properties" ]]
-															then
-																 awk -F= '!a[$1]++' /var/pari/dash/resources/server/global/cma.properties $file > /var/pari/dash/resources/server/global/cmaPropMerge
-																 
-																 mv /var/pari/dash/resources/server/global/cmaPropMerge /var/pari/dash/resources/server/global/cma.properties
-																 
-																 chmod 755 /var/pari/dash/resources/server/global/cma.properties
-																 
-														elif [[ $newFile == "resources/server/global/nccm-asd.properties" ]]
-															then
-																 awk -F= '!a[$1]++' /var/pari/dash/resources/server/global/nccm-asd.properties $file > /var/pari/dash/resources/server/global/asdPropMerge
-																 
-																 mv /var/pari/dash/resources/server/global/asdPropMerge /var/pari/dash/resources/server/global/nccm-asd.properties										
-																					fi
-														else
-															 echo "Coping file.... "$file" to /var/pari/dash/"$newFile
-															 \cp -f $file '/var/pari/dash/'$newFile
-														fi	
-							else
-									echo "VIKASH Coping file.... "$file" to /var/pari/dash/"$newFile
-									\cp -f $file '/var/pari/dash/'$newFile
-							fi
-				fi
-		fi
+#Post Install
+if [ -f $USER_INSTALL_DIR/dash ]
+	then
+		rm -rf  /etc/init.d/dash
+        cp $USER_INSTALL_DIR/dash /etc/init.d/
+fi
+if [ -f $USER_INSTALL_DIR/catalinaLogRotation ]
+	then
+		rm -rf  /etc/logrotate.d/catalinaLogRotation
+        cp $USER_INSTALL_DIR/catalinaLogRotation  /etc/logrotate.d/
+fi
+sh $USER_INSTALL_DIR/nccm_misc.sh
+chmod 777 $USER_INSTALL_DIR/linux_release/*
+chmod +x $USER_INSTALL_DIR/linux_release/webui/tomcat/bin/*.sh
+chmod 777 $USER_INSTALL_DIR/linux_release/webui/tomcat/webapps/*
+\cp -rf $USER_INSTALL_DIR/linux_release/. $USER_INSTALL_FOLDER_2
+rm -rf $USER_INSTALL_DIR/linux_release
+\cp -rf $USER_INSTALL_DIR/. $USER_INSTALL_FOLDER_2/bin
+sh $USER_INSTALL_FOLDER_2/bin/upgrade_properties.sh
+rm -rf $USER_INSTALL_DIR
+cd 
+chmod -R 777 $USER_INSTALL_FOLDER_2/
+sh $USER_INSTALL_FOLDER_2/bin/postInstall.sh
+sh $USER_INSTALL_FOLDER_2/bin/PerlModules/installPerlModules.sh
+sh $USER_INSTALL_FOLDER_2/bin/certificate_check.sh
+sh $USER_INSTALL_FOLDER_2/bin/RHELScriptExecutor.sh
+sh $USER_INSTALL_FOLDER_2/bin/upgradedb.sh 1
+sleep 60s
+sh $USER_INSTALL_FOLDER_2/bin/upgradewebuserdb.sh
+chmod -R 775 $USER_INSTALL_FOLDER_2/
+chown -R nccmuser:nccmusers  $USER_INSTALL_FOLDER_2/logs
+chown -R nccmuser:nccmusers $USER_INSTALL_FOLDER_2/webui
+chown -R nccmuser:nccmusers $USER_INSTALL_FOLDER_1/startup.log
+chown -R nccmuser:nccmusers  $USER_INSTALL_FOLDER_2/tomcat.out
+chown -R nccmuser:nccmusers $USER_INSTALL_FOLDER_2/logs/nccmws.log
+chmod -R 750 $USER_INSTALL_FOLDER_2/logs
+chmod 744 $USER_INSTALL_FOLDER_2/resources/server/pasrule/osVersions.xml
+chmod 777 $USER_INSTALL_FOLDER_2/tmp
+setfacl -Rm d:u::rwx,d:g::rx $USER_INSTALL_FOLDER_2/logs
+# Extracting new web.xml from nccmweb.war for Password Updation
+cd $USER_INSTALL_FOLDER_2/webui/tomcat/webapps
+rm -rf nccmweb
+mkdir WEB-INF
+touch WEB-INF/web.xml
+unzip -p nccmweb.war WEB-INF/web.xml > WEB-INF/web.xml
 
-done
-# Executing commands from 'instructions' file
+# Getting the old password from old web.xml and replacing in new web.xml
+NEW_WEBXML_PATH=dash/webui/tomcat/webapps/WEB-INF/web.xml
+OLD_WEBXML_PATH=dash_backup/webui/tomcat/webapps/nccmweb/WEB-INF/web.xml
+pwdLineInNewWebXml="$(grep -n config.nccmserver.systemuser_pwd $USER_INSTALL_FOLDER_1/$NEW_WEBXML_PATH | sed -r 's#([0-9][0-9]*).*#\1#')"
+pwdLineInNewWebXml=`expr $pwdLineInNewWebXml + 1`
+newPwd=$(sed -n $pwdLineInNewWebXml'p' $USER_INSTALL_FOLDER_1/$NEW_WEBXML_PATH | sed -r 's#^[ /t]*##' | sed -r 's#[ /t]*$##' | sed 's#<param-value>##' | sed 's#</param-value>##')
+newPwd=$(echo $newPwd | sed 's/[[:space:]]//g')
+pwdLineInOldWebXml="$(grep -n config.nccmserver.systemuser_pwd $USER_INSTALL_FOLDER_1/$OLD_WEBXML_PATH | sed -r 's#([0-9][0-9]*).*#\1#')"
+pwdLineInOldWebXml=`expr $pwdLineInOldWebXml + 1`
+oldPwd=$(sed -n $pwdLineInOldWebXml'p' $USER_INSTALL_FOLDER_1/$OLD_WEBXML_PATH | sed -r 's#^[ /t]*##' | sed -r 's#[ /t]*$##' | sed 's#<param-value>##' | sed 's#</param-value>##')
+oldPwd=$(echo $oldPwd | sed 's/[[:space:]]//g')
+sed -i "s/$newPwd/$oldPwd/" $USER_INSTALL_FOLDER_1/$NEW_WEBXML_PATH
+
+# Updating nccmweb.war with the updated new web.xml
+zip nccmweb.war WEB-INF/web.xml
+rm -rf WEB-INF/
+cd -
+
 bash instructions.txt
-
+service dash start
+cd $USER_INSTALL_FOLDER_2/resources/server/serverhm/
+sh $USER_INSTALL_FOLDER_2/resources/server/serverhm/syshealth_installer.sh
+rm -rf $USER_INSTALL_FOLDER_2/resources/server/serverhm/
+chmod -R 775 $USER_INSTALL_FOLDER_2/serverhm/syshealth/bin/
+/usr/bin/tclsh $USER_INSTALL_FOLDER_2/serverhm/syshealth/system/nccm_commands_executer.tcl 2>/tmp/out.err 1>/tmp/out.log

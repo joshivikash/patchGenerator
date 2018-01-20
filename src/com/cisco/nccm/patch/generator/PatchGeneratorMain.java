@@ -30,7 +30,6 @@ public class PatchGeneratorMain {
     private static ZipFile      zipFile = null;
     private static List<String> lines;
     private static List<String> filesCopiedToZip;
-    private static boolean      isUpgradeDB;
     private static Path         catalogueFilePath;
 
     public static void main(String[] args) {
@@ -87,9 +86,6 @@ public class PatchGeneratorMain {
                     if (!zipEntry.isDirectory()) {
                         Files.copy(inputStream, Paths.get("ServerPatch" + File.separator + zipEntry.getName()),
                                 StandardCopyOption.REPLACE_EXISTING);
-                        if (!isUpgradeDB && zipEntry.getName().endsWith("nccmupgradescript_postgres.sql")) {
-                            isUpgradeDB = true;
-                        }
                         filesCopiedToZip.add(zipEntry.getName());
                     }
                     inputStream.close();
@@ -163,16 +159,6 @@ public class PatchGeneratorMain {
             remainingFiles.forEach((fileToBeDeleted) -> {
                 commands.add("rm -f " + dashHome + "/" + fileToBeDeleted.substring(fileToBeDeleted.indexOf("/") + 1));
             });
-            if (isUpgradeDB) {
-                commands.add("cd " + dashHome + "/lib");
-                commands.add(dashHome + "/jre/bin/java -classpath " + dashHome + "/lib/ScriptExecutor.jar:" + dashHome
-                        + "/lib/postgresql-9.3-1103.jdbc4.jar:" + dashHome + "/lib/jasypt-1.9.1.jar:" + dashHome
-                        + "/lib/bcprov-jdk15on-157.jar:" + dashHome + "/lib/log4j-api-2.5.jar:" + dashHome
-                        + "/lib/log4j-core-2.5.jar:" + dashHome
-                        + "/lib/log4j-1.2-api-2.5.jar com.pari.tools.db.ScriptExecutor -upgrade " + dashHome
-                        + "/bin/nccmupgradescript_postgres.sql");
-                commands.add("cd - &> /dev/null");
-            }
             Files.write(instructions, commands, StandardOpenOption.TRUNCATE_EXISTING);
             FileUtils.deleteDirectory(Paths.get("ServerPatch").toFile());
         } catch (Exception e) {
