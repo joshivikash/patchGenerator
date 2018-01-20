@@ -10,8 +10,6 @@ sed -i -e 's/61616/61617/g' /opt/ConcsoTgw/tail-end-gateway-decoupled/conf/tail-
 /etc/init.d/concsotgw restart
 
 sed -i -e 's/nccm.inbound.queue/collector.inbound.queue/g' /opt/cisco/ss/adminshell/properties/tail-end-gateway.properties
-
-echo "Stopping NCCM Service..."
-service dash stop
+sed -i -e 's/nccm.outbound.queue/collector.outbound.queue/g' /opt/cisco/ss/adminshell/properties/tail-end-gateway.properties
 
 exit 0

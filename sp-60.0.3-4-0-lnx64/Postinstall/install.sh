@@ -78,9 +78,6 @@ chmod 644 $SCRIPT_DIR/*.jar
 
 rm -rf /opt/LCM/info/*.db
 
-echo "Starting NCCM Service..."
-service dash start
-
 if [[ -e /tmp/initial_configuration ]] ; then
 
 echo "Fresh Installation..Skipping Reboot"
