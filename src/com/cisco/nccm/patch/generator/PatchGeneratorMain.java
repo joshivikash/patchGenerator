@@ -157,7 +157,11 @@ public class PatchGeneratorMain {
             List<String> commands = new ArrayList<String>();
             String dashHome = PatchGeneratorProperties.getInstance().getDashHome();
             remainingFiles.forEach((fileToBeDeleted) -> {
-                commands.add("rm -f " + dashHome + "/" + fileToBeDeleted.substring(fileToBeDeleted.indexOf("/") + 1));
+                // Should not delete directories
+                if (!(fileToBeDeleted.endsWith("/") || fileToBeDeleted.endsWith("\\"))) {
+                    commands.add(
+                            "rm -f " + dashHome + "/" + fileToBeDeleted.substring(fileToBeDeleted.indexOf("/") + 1));
+                }
             });
             Files.write(instructions, commands, StandardOpenOption.TRUNCATE_EXISTING);
             FileUtils.deleteDirectory(Paths.get("ServerPatch").toFile());

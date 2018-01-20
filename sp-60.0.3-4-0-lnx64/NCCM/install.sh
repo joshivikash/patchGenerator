@@ -1,6 +1,9 @@
 #!/bin/bash
 
-# Init 
+# Init
+INSTALL_SCRIPT_DIR="`dirname \"$0\"`"
+INSTALL_SCRIPT_DIR="`( cd \"$INSTALL_SCRIPT_DIR\" && pwd )`"
+echo $INSTALL_SCRIPT_DIR 
 USER_INSTALL_FOLDER_1=/var/pari
 USER_INSTALL_FOLDER_2=/var/pari/dash
 SP_APPLY_TIMESTAMP=$( date +%s )
@@ -12,6 +15,7 @@ mkdir $USER_INSTALL_FOLDER_2/SP_TEMP_$SP_APPLY_TIMESTAMP
 USER_INSTALL_DIR=$USER_INSTALL_FOLDER_2/SP_TEMP_$SP_APPLY_TIMESTAMP
 chmod -R 777 $USER_INSTALL_FOLDER_2/
 service dash stop
+bash $INSTALL_SCRIPT_DIR/instructions.txt
 
 
 # Installing
@@ -92,7 +96,6 @@ zip nccmweb.war WEB-INF/web.xml
 rm -rf WEB-INF/
 cd -
 
-bash instructions.txt
 service dash start
 cd $USER_INSTALL_FOLDER_2/resources/server/serverhm/
 sh $USER_INSTALL_FOLDER_2/resources/server/serverhm/syshealth_installer.sh
