@@ -59,7 +59,7 @@ sh $USER_INSTALL_FOLDER_2/bin/PerlModules/installPerlModules.sh
 sh $USER_INSTALL_FOLDER_2/bin/certificate_check.sh
 sh $USER_INSTALL_FOLDER_2/bin/RHELScriptExecutor.sh
 sh $USER_INSTALL_FOLDER_2/bin/upgradedb.sh 1
-sleep 60s
+sleep 15s
 sh $USER_INSTALL_FOLDER_2/bin/upgradewebuserdb.sh
 chmod -R 775 $USER_INSTALL_FOLDER_2/
 chown -R nccmuser:nccmusers  $USER_INSTALL_FOLDER_2/logs
@@ -97,8 +97,11 @@ rm -rf WEB-INF/
 cd -
 
 service dash start
-cd $USER_INSTALL_FOLDER_2/resources/server/serverhm/
-sh $USER_INSTALL_FOLDER_2/resources/server/serverhm/syshealth_installer.sh
-rm -rf $USER_INSTALL_FOLDER_2/resources/server/serverhm/
-chmod -R 775 $USER_INSTALL_FOLDER_2/serverhm/syshealth/bin/
-/usr/bin/tclsh $USER_INSTALL_FOLDER_2/serverhm/syshealth/system/nccm_commands_executer.tcl 2>/tmp/out.err 1>/tmp/out.log
+if [ -d $USER_INSTALL_FOLDER_2/resources/server/serverhm/ ]
+        then
+                cd $USER_INSTALL_FOLDER_2/resources/server/serverhm/
+                sh $USER_INSTALL_FOLDER_2/resources/server/serverhm/syshealth_installer.sh
+                rm -rf $USER_INSTALL_FOLDER_2/resources/server/serverhm/
+                chmod -R 775 $USER_INSTALL_FOLDER_2/serverhm/syshealth/bin/
+                /usr/bin/tclsh $USER_INSTALL_FOLDER_2/serverhm/syshealth/system/nccm_commands_executer.tcl 2>/tmp/out.err 1>/tmp/out.log
+fi
