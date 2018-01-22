@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='utf-8'?>
 <component>
-        <name>NCCM Base</name>
+        <name>NCCM</name>
         <description>NCCM Base component</description>
         <provides-version>3.4.0</provides-version>
         <requires>
