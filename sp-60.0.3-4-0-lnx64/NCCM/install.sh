@@ -59,8 +59,8 @@ sh $USER_INSTALL_FOLDER_2/bin/PerlModules/installPerlModules.sh
 sh $USER_INSTALL_FOLDER_2/bin/certificate_check.sh
 sh $USER_INSTALL_FOLDER_2/bin/RHELScriptExecutor.sh
 sh $USER_INSTALL_FOLDER_2/bin/upgradedb.sh 1
-sleep 15s
 sh $USER_INSTALL_FOLDER_2/bin/upgradewebuserdb.sh
+sleep 15s
 chmod -R 775 $USER_INSTALL_FOLDER_2/
 chown -R nccmuser:nccmusers  $USER_INSTALL_FOLDER_2/logs
 chown -R nccmuser:nccmusers $USER_INSTALL_FOLDER_2/webui
