@@ -78,16 +78,6 @@ chmod 644 $SCRIPT_DIR/*.jar
 
 rm -rf /opt/LCM/info/*.db
 
-if [[ -e /tmp/initial_configuration ]] ; then
-
-echo "Fresh Installation..Skipping Reboot"
-else
-echo "============================"
-echo "Rebooting the appliance now"
-echo "============================"
-/sbin/shutdown -P +1 -r now &
-fi
-
 exit 0
 
 

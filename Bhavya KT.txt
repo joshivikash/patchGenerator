@@ -15,7 +15,7 @@ export CLASSPATH=/opt/cisco/ss/adminshell/derby/lib/derbytools.jar:/opt/cisco/ss
 .setNetworkClientCP
 
 java org.apache.derby.tools.ij
-connect 'jdbc:derby://localhost:1527/opt/LCM/info/status;create=true;user=app;password=password';
+connect 'jdbc:derby://localhost:1527/opt/LCM/info/registerInfo;create=true;user=app;password=password';
 update register_info set CONN_LB_URL='https://173.38.37.173/';
 exit;
 
