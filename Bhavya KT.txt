@@ -12,7 +12,7 @@ cd /opt/cisco/ss/adminshell/derby/bin
 export DERBY_HOME=/opt/cisco/ss/adminshell/derby/bin
 export PATH=/opt/java/jre/bin:$PATH
 export CLASSPATH=/opt/cisco/ss/adminshell/derby/lib/derbytools.jar:/opt/cisco/ss/adminshell/derby/lib/derbynet.jar:/opt/cisco/ss/adminshell/derby/lib/derby.jar:/opt/cisco/ss/adminshell/derby/lib/derbyclient.jar:.
-. setNetworkClientCP
+.setNetworkClientCP
 
 java org.apache.derby.tools.ij
 connect 'jdbc:derby://localhost:1527/opt/LCM/info/status;create=true;user=app;password=password';
@@ -45,3 +45,36 @@ LCM Manager : 64.100.244.8
 
 Maven Location :http://engci-maven-master.cisco.com/artifactory/cstg-smartservices-release/com/cisco/ca/ss/lcmAgent/1.6-RELEASE/
 http://engci-maven-master.cisco.com/artifactory/cstg-smartservices-release/com/cisco/ca/ss/lcm/lcmagentmgr-dto/1.6-RELEASE/
+
+
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++===
+1- Modify "/opt/cisco/ss/adminshell/properties/adminshell.properties" 
+	CHANGE "REGISTER_URL=LOCAL"
+
+2- Then go to "/opt/ConcsoTgw/tail-end-gateway-decoupled/conf/"
+	rename file name csof_config.xml" to "csof_config.xml_old"
+
+
+3- 
+
+cd /opt/cisco/ss/adminshell/derby/bin
+export DERBY_HOME=/opt/cisco/ss/adminshell/derby/bin
+export PATH=/opt/java/jre/bin:$PATH
+export CLASSPATH=/opt/cisco/ss/adminshell/derby/lib/derbytools.jar:/opt/cisco/ss/adminshell/derby/lib/derbynet.jar:/opt/cisco/ss/adminshell/derby/lib/derby.jar:/opt/cisco/ss/adminshell/derby/lib/derbyclient.jar:.
+. setNetworkClientCP
+java org.apache.derby.tools.ij
+connect 'jdbc:derby://localhost:1527/opt/LCM/info/orderedList;create=true;user=app;password=password';
+connect 'jdbc:derby://localhost:1527/opt/LCM/info/fileSize;create=true;user=app;password=password';
+
+connect 'jdbc:derby://localhost:1527/opt/LCM/info/passwdMgmt;create=true;user=app;password=password';
+
+connect 'jdbc:derby://localhost:1527/opt/LCM/info/updates;create=true;user=app;password=password';
+
+connect 'jdbc:derby://localhost:1527/opt/LCM/info/registerInfo;create=true;user=app;password=password';
+
+
+
+After login to DB change LCM manager details
+
+"update register_info set CONN_LB_URL='http://64.101.46.53:8080/';"
