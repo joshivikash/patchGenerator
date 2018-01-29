@@ -78,3 +78,8 @@ connect 'jdbc:derby://localhost:1527/opt/LCM/info/registerInfo;create=true;user=
 After login to DB change LCM manager details
 
 "update register_info set CONN_LB_URL='http://64.101.46.53:8080/';"
+
+Updating adminshell.properties for working with Stage Entitlement
+--------------------------------------------------------------------
+/opt/cisco/ss/adminshell/properties/adminshell.properties
+REGISTER_URL=PROD to REGISTER_URL=STAGE
