@@ -7,9 +7,9 @@ echo $INSTALL_SCRIPT_DIR
 USER_INSTALL_FOLDER_1=/var/pari
 USER_INSTALL_FOLDER_2=/var/pari/dash
 SP_APPLY_TIMESTAMP=$( date +%s )
-rm -rf $USER_INSTALL_FOLDER_1/dash_backup
-mkdir $USER_INSTALL_FOLDER_1/dash_backup
-cp -a $USER_INSTALL_FOLDER_2/. $USER_INSTALL_FOLDER_1/dash_backup
+rm -rf $USER_INSTALL_FOLDER_1/dash_backup_sp
+mkdir $USER_INSTALL_FOLDER_1/dash_backup_sp
+cp -a $USER_INSTALL_FOLDER_2/. $USER_INSTALL_FOLDER_1/dash_backup_sp
 rm -rf $USER_INSTALL_FOLDER_2/SP_TEMP*
 mkdir $USER_INSTALL_FOLDER_2/SP_TEMP_$SP_APPLY_TIMESTAMP
 USER_INSTALL_DIR=$USER_INSTALL_FOLDER_2/SP_TEMP_$SP_APPLY_TIMESTAMP
@@ -97,7 +97,7 @@ unzip -p nccmweb.war WEB-INF/web.xml > WEB-INF/web.xml
 
 # Getting the old password from old web.xml and replacing in new web.xml
 NEW_WEBXML_PATH=dash/webui/tomcat/webapps/WEB-INF/web.xml
-OLD_WEBXML_PATH=dash_backup/webui/tomcat/webapps/nccmweb/WEB-INF/web.xml
+OLD_WEBXML_PATH=dash_backup_sp/webui/tomcat/webapps/nccmweb/WEB-INF/web.xml
 pwdLineInNewWebXml="$(grep -n config.nccmserver.systemuser_pwd $USER_INSTALL_FOLDER_1/$NEW_WEBXML_PATH | sed -r 's#([0-9][0-9]*).*#\1#')"
 pwdLineInNewWebXml=`expr $pwdLineInNewWebXml + 1`
 newPwd=$(sed -n $pwdLineInNewWebXml'p' $USER_INSTALL_FOLDER_1/$NEW_WEBXML_PATH | sed -r 's#^[ /t]*##' | sed -r 's#[ /t]*$##' | sed 's#<param-value>##' | sed 's#</param-value>##')
@@ -106,7 +106,10 @@ pwdLineInOldWebXml="$(grep -n config.nccmserver.systemuser_pwd $USER_INSTALL_FOL
 pwdLineInOldWebXml=`expr $pwdLineInOldWebXml + 1`
 oldPwd=$(sed -n $pwdLineInOldWebXml'p' $USER_INSTALL_FOLDER_1/$OLD_WEBXML_PATH | sed -r 's#^[ /t]*##' | sed -r 's#[ /t]*$##' | sed 's#<param-value>##' | sed 's#</param-value>##')
 oldPwd=$(echo $oldPwd | sed 's/[[:space:]]//g')
-sed -i "s/$newPwd/$oldPwd/" $USER_INSTALL_FOLDER_1/$NEW_WEBXML_PATH
+if [[ -n "$oldPwd" ]]
+then
+	sed -i "s/$newPwd/$oldPwd/" $USER_INSTALL_FOLDER_1/$NEW_WEBXML_PATH
+fi
 
 # Updating nccmweb.war with the updated new web.xml
 zip nccmweb.war WEB-INF/web.xml
