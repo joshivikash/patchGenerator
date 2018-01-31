@@ -83,3 +83,4 @@ Updating adminshell.properties for working with Stage Entitlement
 --------------------------------------------------------------------
 /opt/cisco/ss/adminshell/properties/adminshell.properties
 REGISTER_URL=PROD to REGISTER_URL=STAGE
+service adminshell restart
