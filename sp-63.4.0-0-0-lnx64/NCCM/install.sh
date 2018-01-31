@@ -14,7 +14,9 @@ rm -rf $USER_INSTALL_FOLDER_2/SP_TEMP*
 mkdir $USER_INSTALL_FOLDER_2/SP_TEMP_$SP_APPLY_TIMESTAMP
 USER_INSTALL_DIR=$USER_INSTALL_FOLDER_2/SP_TEMP_$SP_APPLY_TIMESTAMP
 chmod -R 777 $USER_INSTALL_FOLDER_2/
+echo "Stopping NCCM server....."
 service dash stop
+echo "NCCM Server Stopped"
 bash $INSTALL_SCRIPT_DIR/instructions.txt
 
 
@@ -35,13 +37,23 @@ chmod +x dash
 #Post Install
 if [ -f $USER_INSTALL_DIR/dash ]
 	then
-		rm -rf  /etc/init.d/dash
-        cp $USER_INSTALL_DIR/dash /etc/init.d/
+	    echo "Overwriting dash..."
+        \cp -f $USER_INSTALL_DIR/dash /etc/init.d/
+		dos2unix /etc/init.d/dash
+fi
+if [ -f /etc/init.d/dash ]
+	then
+	    echo "dash file present"
 fi
 if [ -f $USER_INSTALL_DIR/catalinaLogRotation ]
 	then
-		rm -rf  /etc/logrotate.d/catalinaLogRotation
-        cp $USER_INSTALL_DIR/catalinaLogRotation  /etc/logrotate.d/
+		echo "Overwriting catalinaLogRotation..."
+        \cp -f $USER_INSTALL_DIR/catalinaLogRotation  /etc/logrotate.d/
+		dos2unix /etc/logrotate.d/catalinaLogRotation
+fi
+if [ -f /etc/logrotate.d/catalinaLogRotation ]
+	then
+		echo "catalinaLogRotation is present"
 fi
 sh $USER_INSTALL_DIR/nccm_misc.sh
 chmod 777 $USER_INSTALL_DIR/linux_release/*
@@ -50,6 +62,7 @@ chmod 777 $USER_INSTALL_DIR/linux_release/webui/tomcat/webapps/*
 \cp -rf $USER_INSTALL_DIR/linux_release/. $USER_INSTALL_FOLDER_2
 rm -rf $USER_INSTALL_DIR/linux_release
 \cp -rf $USER_INSTALL_DIR/. $USER_INSTALL_FOLDER_2/bin
+dos2unix $USER_INSTALL_FOLDER_2/bin/*.sh
 sh $USER_INSTALL_FOLDER_2/bin/upgrade_properties.sh
 rm -rf $USER_INSTALL_DIR
 cd 
@@ -96,7 +109,9 @@ zip nccmweb.war WEB-INF/web.xml
 rm -rf WEB-INF/
 cd -
 
+echo "starting NCCM Server"
 service dash start
+echo "NCCM Server Started"
 if [ -d $USER_INSTALL_FOLDER_2/resources/server/serverhm/ ]
         then
                 cd $USER_INSTALL_FOLDER_2/resources/server/serverhm/
