@@ -63,6 +63,10 @@ chmod 777 $USER_INSTALL_DIR/linux_release/webui/tomcat/webapps/*
 rm -rf $USER_INSTALL_DIR/linux_release
 \cp -rf $USER_INSTALL_DIR/. $USER_INSTALL_FOLDER_2/bin
 dos2unix $USER_INSTALL_FOLDER_2/bin/*.sh
+dos2unix $USER_INSTALL_FOLDER_2/bin/*.sql
+dos2unix $USER_INSTALL_FOLDER_2/bin/*.tcl
+dos2unix $USER_INSTALL_FOLDER_2/bin/catalinaLogRotation
+dos2unix $USER_INSTALL_FOLDER_2/bin/dash
 sh $USER_INSTALL_FOLDER_2/bin/upgrade_properties.sh
 rm -rf $USER_INSTALL_DIR
 cd 
