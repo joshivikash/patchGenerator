@@ -30,45 +30,43 @@ unzip ServerPatch
 rm -f ServerPatch.zip
 unzip PerlModules
 rm -f PerlModules.zip
-chmod +x *.sh
-chmod +x *.sql
-chmod +x dash
+chmod +x linux_release/bin/*.sh
+chmod +x linux_release/bin/*.sql
+chmod +x linux_release/bin/dash
 
 #Post Install
-if [ -f $USER_INSTALL_DIR/dash ]
+if [ -f $USER_INSTALL_DIR/linux_release/bin/dash ]
 	then
 	    echo "Overwriting dash..."
-        \cp -f $USER_INSTALL_DIR/dash /etc/init.d/
+        \cp -f $USER_INSTALL_DIR/linux_release/bin/dash /etc/init.d/
 		dos2unix /etc/init.d/dash
 fi
 if [ -f /etc/init.d/dash ]
 	then
 	    echo "dash file present"
 fi
-if [ -f $USER_INSTALL_DIR/catalinaLogRotation ]
+if [ -f $USER_INSTALL_DIR/linux_release/bin/catalinaLogRotation ]
 	then
 		echo "Overwriting catalinaLogRotation..."
-        \cp -f $USER_INSTALL_DIR/catalinaLogRotation  /etc/logrotate.d/
+        \cp -f $USER_INSTALL_DIR/linux_release/bin/catalinaLogRotation  /etc/logrotate.d/
 		dos2unix /etc/logrotate.d/catalinaLogRotation
 fi
 if [ -f /etc/logrotate.d/catalinaLogRotation ]
 	then
 		echo "catalinaLogRotation is present"
 fi
-sh $USER_INSTALL_DIR/nccm_misc.sh
+sh $USER_INSTALL_DIR/linux_release/bin/nccm_misc.sh
 chmod 777 $USER_INSTALL_DIR/linux_release/*
 chmod +x $USER_INSTALL_DIR/linux_release/webui/tomcat/bin/*.sh
 chmod 777 $USER_INSTALL_DIR/linux_release/webui/tomcat/webapps/*
 \cp -rf $USER_INSTALL_DIR/linux_release/. $USER_INSTALL_FOLDER_2
-rm -rf $USER_INSTALL_DIR/linux_release
-\cp -rf $USER_INSTALL_DIR/. $USER_INSTALL_FOLDER_2/bin
+rm -rf $USER_INSTALL_DIR
 dos2unix $USER_INSTALL_FOLDER_2/bin/*.sh
 dos2unix $USER_INSTALL_FOLDER_2/bin/*.sql
 dos2unix $USER_INSTALL_FOLDER_2/bin/*.tcl
 dos2unix $USER_INSTALL_FOLDER_2/bin/catalinaLogRotation
 dos2unix $USER_INSTALL_FOLDER_2/bin/dash
 sh $USER_INSTALL_FOLDER_2/bin/upgrade_properties.sh
-rm -rf $USER_INSTALL_DIR
 cd 
 chmod -R 777 $USER_INSTALL_FOLDER_2/
 sh $USER_INSTALL_FOLDER_2/bin/postInstall.sh
